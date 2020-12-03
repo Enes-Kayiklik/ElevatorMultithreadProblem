@@ -11,19 +11,19 @@ class Print {
             elevatorList: List<Elevator>,
             floorQueue: List<Floor>
     ) {
-        println("\u000c")
-        printFloorQueue(floorQueue, exitQueue)
+        printFloorQueue(floorQueue)
         printElevator(elevatorList)
         printWaitingQueue(loginQueue, exitQueue)
+        println("-------------------------------------------------------------------------------------------------")
     }
 
-    private fun printWaitingQueue(loginQueue: List<People>, exitQueue: List<People>) {
-        println("0. floor : ${loginQueue.printContent()}")
-        println("1. floor : ${exitQueue.singleOrNull { it.currentFloor == 1 }?.printContent() ?: emptyList<Int>()}")
-        println("2. floor : ${exitQueue.singleOrNull { it.currentFloor == 2 }?.printContent() ?: emptyList<Int>()}")
-        println("3. floor : ${exitQueue.singleOrNull { it.currentFloor == 3 }?.printContent() ?: emptyList<Int>()}")
-        println("4. floor : ${exitQueue.singleOrNull { it.currentFloor == 4 }?.printContent() ?: emptyList<Int>()}")
-
+    private fun printFloorQueue(floorQueue: List<Floor>) {
+        println("0. floor : -- queue : ${floorQueue[0].exitQueueSize}")
+        (1..4).forEach { floor ->
+            val it = floorQueue[floor]
+            println("${it.floorNumber}. floor : ${it.currentCustomerSize} queue : ${it.exitQueueSize}")
+        }
+        println("\n\n")
     }
 
     private fun printElevator(elevatorList: List<Elevator>) {
@@ -41,10 +41,10 @@ class Print {
         }
     }
 
-    private fun printFloorQueue(floorQueue: List<Floor>, exitQueue: List<People>) {
-        floorQueue.forEach {
-            println("${it.floorNumber}. floor : ${it.currentCustomerSize} queue : ${exitQueue.singleOrNull { single -> single.targetFloor == 0 }?.count ?: 0}")
+    private fun printWaitingQueue(loginQueue: List<People>, exitQueue: List<People>) {
+        println("0. floor : ${loginQueue.printContent()}")
+        (1..4).forEach { floor ->
+            println("$floor. floor : ${exitQueue.singleOrNull { it.currentFloor == floor }?.printContent() ?: emptyList<Int>()}")
         }
-        println("\n\n")
     }
 }

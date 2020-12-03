@@ -55,16 +55,29 @@ data class Elevator(
     }
 
     private fun getExitQueue() {
-        if (currentSize < 10 && exitQueue.any { it.currentFloor == currentFloor }) {
-            val people = exitQueue.firstOrNull() ?: People()
-            if (people.count > 0) {
-                floorQueue[currentFloor].currentCustomerSize -= minOf(people.count, 10 - currentSize)
-                customersInElevator.add(People(minOf(people.count, 10 - currentSize), people.targetFloor))
+        // if current floor !=0 and elevator isGoingDown and there is people at exit Queue get them inside
+        for (people in exitQueue) {
+            if (people.currentFloor == currentFloor && currentSize < 10 && people.count > 0) {
                 val lastIncluded = minOf(people.count, 10 - currentSize)
+                customersInElevator.add(People(lastIncluded, people.targetFloor))
+                floorQueue[people.currentFloor].exitQueueSize -= lastIncluded
+                floorQueue[people.currentFloor].currentCustomerSize -= lastIncluded
                 currentSize += lastIncluded
                 people.count = maxOf(people.count - lastIncluded, 0)
             }
         }
+        /*val index = exitQueue.indexOfFirst { it.currentFloor == currentFloor }
+        if (currentSize < 10) {
+            val people = exitQueue.getOrNull(index) ?: People()
+            if (people.count > 0) {
+                val lastIncluded = minOf(people.count, 10 - currentSize)
+                customersInElevator.add(People(lastIncluded, people.targetFloor))
+                /*floorQueue[people.currentFloor].exitQueueSize -= lastIncluded
+                floorQueue[people.currentFloor].currentCustomerSize -= lastIncluded*/
+                currentSize += lastIncluded
+                people.count = maxOf(people.count - lastIncluded, 0)
+            }
+        }*/
     }
 
     private fun getCustomersInTheElevator() {
@@ -75,6 +88,7 @@ data class Elevator(
                 val lastIncluded = minOf(people.count, 10 - currentSize)
                 currentSize += lastIncluded
                 people.count = maxOf(people.count - lastIncluded, 0)
+                floorQueue[currentFloor].exitQueueSize -= lastIncluded
             }
         }
     }

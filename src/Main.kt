@@ -7,7 +7,7 @@ import utils.createThread
 
 private val loginQueue = mutableListOf<People>()
 private val exitQueue = mutableListOf<People>()
-private val floorQueue = MutableList(5) { Floor(0, it) }
+private val floorQueue = MutableList(5) { Floor(0, 0, it) }
 private val elevatorThreadList = MutableList(5) {
     Elevator(loginQueue, exitQueue, floorQueue,
             isAlive = it == 0,
@@ -25,13 +25,18 @@ private fun setLoginQueue(people: People) {
         loginQueue.first { it.targetFloor == people.targetFloor }.count += people.count
     else
         loginQueue.add(people).also { loginQueue.sortBy { it.targetFloor } }
+
+    floorQueue[people.currentFloor].currentCustomerSize += people.count
+    floorQueue[people.currentFloor].exitQueueSize += people.count
 }
 
 private fun setExitQueue(people: People) {
-    if (exitQueue.any { it.targetFloor == people.targetFloor })
-        exitQueue.first { it.targetFloor == people.targetFloor }.count += people.count
+    if (exitQueue.any { it.currentFloor == people.currentFloor })
+        exitQueue.single { it.currentFloor == people.currentFloor }.count += people.count
     else
         exitQueue.add(people)
+
+    floorQueue[people.currentFloor].exitQueueSize += people.count
 }
 
 private suspend fun setupMall() {

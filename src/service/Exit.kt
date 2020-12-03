@@ -10,10 +10,10 @@ class Exit {
             flow {
                 while (true) {
                     delay(1000L)
-                    val size = (1..5).random()
-                    val filteredFloor = floorQueue.filter { it.currentCustomerSize >= size }
+                    val peopleCount = (1..5).random()
+                    val filteredFloor = floorQueue.filter { it.currentCustomerSize - it.exitQueueSize >= peopleCount && it.floorNumber > 0 }
                     if (filteredFloor.isNotEmpty())
-                        emit(People(size, 0, filteredFloor.random().floorNumber))
+                        emit(People(peopleCount, 0, filteredFloor.random().floorNumber))
                 }
             }
 }
