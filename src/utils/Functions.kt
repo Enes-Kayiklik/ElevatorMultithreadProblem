@@ -2,12 +2,10 @@ package utils
 
 import kotlinx.coroutines.newSingleThreadContext
 import model.People
-import service.Elevator
 import java.lang.StringBuilder
 
 fun createThread(name: String) = newSingleThreadContext(name)
 
-@JvmName("printContentPeople")
 fun List<People>.printContent(): StringBuilder? {
     val result = StringBuilder("")
     val size = this.size
@@ -33,15 +31,9 @@ fun MutableList<People>.addElement(element: People) {
     else
         this.add(element)
 }
-/*@JvmName("printContentElevator")
-fun List<Elevator>.printContent(): StringBuilder {
-    val result = StringBuilder("")
-    val size = this.size
-    result.append('[')
-    for ((index, t) in this.withIndex()) {
-        result.append("[${t.customersInElevator.printContent()}, size -> ${t.currentSize}, currentFloor -> ${t.currentFloor}]")
-        if (index != size - 1) result.append(", ")
+
+inline fun <T> List<T>.filtered(predicate : (T) -> Boolean): List<T>? {
+    this.filter(predicate).also {
+        return if (it.isNullOrEmpty()) null else it
     }
-    result.append(']')
-    return result
-}*/
+}

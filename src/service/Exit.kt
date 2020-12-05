@@ -4,16 +4,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import model.Floor
 import model.People
+import utils.filtered
 
 class Exit {
     suspend fun exitRandomCustomer(floorQueue: List<Floor>) =
             flow {
                 while (true) {
                     delay(1000L)
-                    val peopleCount = (1..5).random()
-                    val filteredFloor = floorQueue.filter { it.currentCustomerSize - it.exitQueueSize >= peopleCount && it.floorNumber > 0 }
-                    if (filteredFloor.isNotEmpty())
-                        emit(People(peopleCount, 0, filteredFloor.random().floorNumber))
+                    floorQueue.filtered { it.currentCustomerSize > 0 && it.floorNumber > 0 }?.random()?.let { randomFloor ->
+                        emit(People(minOf((1..5).random(), randomFloor.currentCustomerSize), 0, randomFloor.floorNumber))
+                    }
                 }
             }
 }
