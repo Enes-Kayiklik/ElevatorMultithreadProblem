@@ -31,7 +31,7 @@ class Print {
             println(""" active : ${it.isAlive}
                         floor : ${it.currentFloor}
                         destination : $...
-                        direction : $..
+                        direction : ${it.direction}
                         capacity : 10
                         countInside : ${it.customersInElevator.sumBy { p -> p.count }}
                         inside : ${it.customersInElevator.printContent()}

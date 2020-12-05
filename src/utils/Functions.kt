@@ -27,6 +27,12 @@ fun People.printContent(): StringBuilder? {
         StringBuilder("[${this.count}, ${this.targetFloor}]")
 }
 
+fun MutableList<People>.addElement(element: People) {
+    if (this.any { it.targetFloor == element.targetFloor })
+        this.first { it.targetFloor == element.targetFloor }.count += element.count
+    else
+        this.add(element)
+}
 /*@JvmName("printContentElevator")
 fun List<Elevator>.printContent(): StringBuilder {
     val result = StringBuilder("")

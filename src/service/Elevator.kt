@@ -5,6 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import model.Floor
 import model.People
+import utils.addElement
 import utils.createThread
 
 data class Elevator(
@@ -18,6 +19,8 @@ data class Elevator(
 ) {
     private val elevatorThread = createThread(name.toString())
     private var isGoingUp = true
+    val direction get() = if (isGoingUp) "Up" else "Down"
+
     private var currentSize = 0
 
     init {
@@ -59,33 +62,21 @@ data class Elevator(
         for (people in exitQueue) {
             if (people.currentFloor == currentFloor && currentSize < 10 && people.count > 0) {
                 val lastIncluded = minOf(people.count, 10 - currentSize)
-                customersInElevator.add(People(lastIncluded, people.targetFloor))
+                customersInElevator.addElement(People(lastIncluded, people.targetFloor))
                 floorQueue[people.currentFloor].exitQueueSize -= lastIncluded
                 floorQueue[people.currentFloor].currentCustomerSize -= lastIncluded
                 currentSize += lastIncluded
                 people.count = maxOf(people.count - lastIncluded, 0)
             }
         }
-        /*val index = exitQueue.indexOfFirst { it.currentFloor == currentFloor }
-        if (currentSize < 10) {
-            val people = exitQueue.getOrNull(index) ?: People()
-            if (people.count > 0) {
-                val lastIncluded = minOf(people.count, 10 - currentSize)
-                customersInElevator.add(People(lastIncluded, people.targetFloor))
-                /*floorQueue[people.currentFloor].exitQueueSize -= lastIncluded
-                floorQueue[people.currentFloor].currentCustomerSize -= lastIncluded*/
-                currentSize += lastIncluded
-                people.count = maxOf(people.count - lastIncluded, 0)
-            }
-        }*/
     }
 
     private fun getCustomersInTheElevator() {
         // if any empty space in elevator than let customers get in
         for (people in loginQueue) {
             if (currentSize < 10 && people.count > 0) {
-                customersInElevator.add(People(minOf(people.count, 10 - currentSize), people.targetFloor))
                 val lastIncluded = minOf(people.count, 10 - currentSize)
+                customersInElevator.add(People(lastIncluded, people.targetFloor))
                 currentSize += lastIncluded
                 people.count = maxOf(people.count - lastIncluded, 0)
                 floorQueue[currentFloor].exitQueueSize -= lastIncluded

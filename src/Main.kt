@@ -3,6 +3,7 @@ import kotlinx.coroutines.flow.*
 import model.Floor
 import model.People
 import service.*
+import utils.addElement
 import utils.createThread
 
 private val loginQueue = mutableListOf<People>()
@@ -21,16 +22,18 @@ suspend fun main() {
 }
 
 private fun setLoginQueue(people: People) {
-    if (loginQueue.any { it.targetFloor == people.targetFloor })
+    loginQueue.addElement(people).also { loginQueue.sortBy { it.targetFloor } }
+    /*if (loginQueue.any { it.targetFloor == people.targetFloor })
         loginQueue.first { it.targetFloor == people.targetFloor }.count += people.count
     else
-        loginQueue.add(people).also { loginQueue.sortBy { it.targetFloor } }
+        loginQueue.add(people).also { loginQueue.sortBy { it.targetFloor } }*/
 
     floorQueue[people.currentFloor].currentCustomerSize += people.count
     floorQueue[people.currentFloor].exitQueueSize += people.count
 }
 
 private fun setExitQueue(people: People) {
+    //exitQueue.addElement(people)
     if (exitQueue.any { it.currentFloor == people.currentFloor })
         exitQueue.single { it.currentFloor == people.currentFloor }.count += people.count
     else
@@ -50,12 +53,17 @@ private suspend fun setupMall() {
 
     CoroutineScope(createThread("control")).launch {
         while (true) {
-            if (Control().checkRequireElevator(loginQueue, emptyList(), elevatorThreadList.count { it.isAlive }))
+            val control = Control().checkRequireElevator(floorQueue, elevatorThreadList.count { it.isAlive })
+            if (control) {
                 elevatorThreadList.first { !it.isAlive }.apply {
                     isAlive = true
                     callElevator()
                 }
-            else if (!Control().checkRequireElevator(loginQueue, emptyList(), elevatorThreadList.count { it.isAlive }) && elevatorThreadList.count { it.isAlive } != 1) {
+            }
+            if (!control &&
+                    elevatorThreadList.count { it.isAlive } != 1 &&
+                    elevatorThreadList.last { it.isAlive }.customersInElevator.isEmpty()
+            ) {
                 elevatorThreadList.last { it.isAlive }.isAlive = false
             }
         }
@@ -64,7 +72,7 @@ private suspend fun setupMall() {
     CoroutineScope(createThread("print")).launch {
         while (true) {
             Print().printStatement(loginQueue, exitQueue, elevatorThreadList, floorQueue)
-            delay(2000L)
+            delay(500L)
         }
     }
 }

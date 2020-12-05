@@ -1,15 +1,14 @@
 package service
 
 import kotlinx.coroutines.delay
-import model.People
+import model.Floor
 
 class Control {
     suspend fun checkRequireElevator(
-            loginQueue: List<People>,
-            exitQueue: List<People>,
+            floorQueue: List<Floor>,
             elevatorCount: Int
     ): Boolean {
-        delay(500L)
-        return loginQueue.sumBy { it.count } + exitQueue.sumBy { it.count } > 10 * 2 * elevatorCount && elevatorCount < 5
+        delay(30L)
+        return floorQueue.sumBy { it.exitQueueSize } >= 10 * 2 * elevatorCount && elevatorCount < 5
     }
 }
