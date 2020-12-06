@@ -9,13 +9,13 @@ import utils.addElement
 import utils.createThread
 
 data class Elevator(
-        val loginQueue: List<People> = listOf(People()),
-        val exitQueue: List<People> = listOf(People()),
-        val floorQueue: List<Floor> = listOf(Floor()),
-        val customersInElevator: MutableList<People> = mutableListOf(),
-        val name: Int,
-        var currentFloor: Int = 0,
-        var isAlive: Boolean = false
+    val loginQueue: List<People> = listOf(People()),
+    val exitQueue: List<People> = listOf(People()),
+    val floorQueue: List<Floor> = listOf(Floor()),
+    val customersInElevator: MutableList<People> = mutableListOf(),
+    val name: Int,
+    var currentFloor: Int = 0,
+    var isAlive: Boolean = false
 ) {
     private val elevatorThread = createThread(name.toString())
     private var isGoingUp = true

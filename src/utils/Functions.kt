@@ -32,7 +32,7 @@ fun MutableList<People>.addElement(element: People) {
         this.add(element)
 }
 
-inline fun <T> List<T>.filtered(predicate : (T) -> Boolean): List<T>? {
+inline fun <T> List<T>.filtered(predicate: (T) -> Boolean): List<T>? {
     this.filter(predicate).also {
         return if (it.isNullOrEmpty()) null else it
     }

@@ -6,10 +6,10 @@ import utils.printContent
 
 class Print {
     fun printStatement(
-            loginQueue: List<People>,
-            exitQueue: List<People>,
-            elevatorList: List<Elevator>,
-            floorQueue: List<Floor>
+        loginQueue: List<People>,
+        exitQueue: List<People>,
+        elevatorList: List<Elevator>,
+        floorQueue: List<Floor>
     ) {
         printFloorQueue(floorQueue)
         printElevator(elevatorList)
@@ -28,7 +28,8 @@ class Print {
 
     private fun printElevator(elevatorList: List<Elevator>) {
         elevatorList.forEach {
-            println(""" active : ${it.isAlive}
+            println(
+                """ active : ${it.isAlive}
                         floor : ${it.currentFloor}
                         destination : $...
                         direction : ${it.direction}
@@ -37,14 +38,19 @@ class Print {
                         inside : ${it.customersInElevator.printContent()}
                 
                 
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
     }
 
     private fun printWaitingQueue(loginQueue: List<People>, exitQueue: List<People>) {
         println("0. floor : ${loginQueue.printContent()}")
         (1..4).forEach { floor ->
-            println("$floor. floor : ${exitQueue.singleOrNull { it.currentFloor == floor }?.printContent() ?: emptyList<Int>()}")
+            println(
+                "$floor. floor : ${
+                    exitQueue.singleOrNull { it.currentFloor == floor }?.printContent() ?: emptyList<Int>()
+                }"
+            )
         }
     }
 }
