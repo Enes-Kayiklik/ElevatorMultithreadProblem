@@ -15,17 +15,23 @@ data class Elevator(
     val customersInElevator: MutableList<People> = mutableListOf(),
     val name: Int,
     var currentFloor: Int = 0,
-    var isAlive: Boolean = false
 ) {
     private val elevatorThread = createThread(name.toString())
     private var isGoingUp = true
-    val direction get() = if (isGoingUp) "Up" else "Down"
-
     private var currentSize = 0
-
-    init {
-        callElevator()
-    }
+    val direction get() = if (isGoingUp) "Up" else "Down"
+    var isAlive: Boolean = false
+        get() = when {
+            !field -> customersInElevator.isNotEmpty()
+            else -> field
+        }
+        set(value) {
+            field = when {
+                value -> value
+                customersInElevator.isEmpty() -> value
+                else -> isAlive
+            }
+        }
 
     fun callElevator() {
         CoroutineScope(elevatorThread).launch {
@@ -60,7 +66,7 @@ data class Elevator(
     private fun getExitQueue() {
         // if current floor !=0 and elevator isGoingDown and there is people at exit Queue get them inside
         for (people in exitQueue) {
-            if (people.currentFloor == currentFloor && currentSize < 10 && people.count > 0) {
+            if (people.currentFloor == currentFloor && currentSize < 10 && people.count > 0 && isAlive) {
                 val lastIncluded = minOf(people.count, 10 - currentSize)
                 customersInElevator.addElement(People(lastIncluded, people.targetFloor))
                 floorQueue[people.currentFloor].exitQueueSize -= lastIncluded
@@ -74,7 +80,7 @@ data class Elevator(
     private fun getCustomersInTheElevator() {
         // if any empty space in elevator than let customers get in
         for (people in loginQueue) {
-            if (currentSize < 10 && people.count > 0) {
+            if (currentSize < 10 && people.count > 0 && isAlive) {
                 val lastIncluded = minOf(people.count, 10 - currentSize)
                 customersInElevator.add(People(lastIncluded, people.targetFloor))
                 currentSize += lastIncluded

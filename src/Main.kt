@@ -9,12 +9,13 @@ import utils.createThread
 private val loginQueue = mutableListOf<People>()
 private val exitQueue = mutableListOf<People>()
 private val floorQueue = MutableList(5) { Floor(0, 0, it) }
-private val elevatorThreadList = MutableList(5) {
+private val elevatorThreadList = MutableList(5) { num ->
     Elevator(
         loginQueue, exitQueue, floorQueue,
-        isAlive = it == 0,
-        name = it + 1
-    )
+        name = num + 1
+    ).also {
+        it.isAlive = num == 0; if (num == 0) it.callElevator()
+    }
 }
 
 suspend fun main() {
@@ -48,28 +49,23 @@ private suspend fun setupMall() {
 
     CoroutineScope(createThread("control")).launch {
         while (true) {
-            elevatorBuffer()
-        }
-    }
-
-    CoroutineScope(createThread("print")).launch {
-        while (true) {
             Print().printStatement(loginQueue, exitQueue, elevatorThreadList, floorQueue)
+            elevatorBuffer()
             delay(500L)
         }
     }
 }
 
-private suspend fun elevatorBuffer() {
+private fun elevatorBuffer() {
     val control = Control().checkRequireElevator(floorQueue, elevatorThreadList.count { it.isAlive })
     if (control) {
         elevatorThreadList.first { !it.isAlive }.apply {
             isAlive = true
             callElevator()
         }
-    } else if (!control &&
+    } else if (
         elevatorThreadList.count { it.isAlive } > 1 &&
-        elevatorThreadList.last { it.isAlive }.customersInElevator.isEmpty()
+        elevatorThreadList.any { it.isAlive && it.customersInElevator.isEmpty() }
     ) {
         elevatorThreadList.last { it.isAlive }.isAlive = false
     }
